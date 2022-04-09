@@ -1,0 +1,8 @@
+{
+  "Color": {
+    "Favorite": "Blue"
+  },
+  "ConnectionStrings": {
+    "OleMissChatboxContextDb": "Data Source=DESKTOP-9JC39CK\\SQLEXPRESS;Initial Catalog=OleMissChatboxDb;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=true;"
+  }
+}
