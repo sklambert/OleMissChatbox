@@ -16,9 +16,9 @@ namespace OleMissChatbox.Services
             _repo = repo;
         }
 
-        public bool RegisterUser(string firstname, string lastname, string email, string password)
+        public bool RegisterUser(string firstname, string lastname, string email, string password, int usertype)
         {
-            return _repo.AddUser(firstname, lastname, email, HashPassword(password, Encoding.ASCII.GetBytes(_salt)));
+            return _repo.AddUser(firstname, lastname, email, HashPassword(password, Encoding.ASCII.GetBytes(_salt)), usertype);
         }
 
         public User GetAuthenticatedUser(string email, string password)
@@ -28,18 +28,19 @@ namespace OleMissChatbox.Services
 
             // call the context to query the matching email address' password value from the database
             var user = _repo.GetUserByEmail(email);
+            
+            if (user != null)
+            {
+                if (hashedPassword == user.Password)
+                {
+                    // compare the two
+                    // if match, then return user
+                    return user;
+                }
+            }
 
-            if (hashedPassword == user.Password)
-            {
-                // compare the two
-                // if match, then return user
-                return user;
-            }
-            else
-            {
-                // if no match, then return null to indicate unauthorized
-                return null;
-            }
+            // if no match, then return null to indicate unauthorized
+            return null;
         }
 
         private static string HashPassword(string password, byte[] salt)

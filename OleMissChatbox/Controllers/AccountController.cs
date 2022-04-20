@@ -33,17 +33,18 @@ namespace OleMissChatbox.Controllers
             {
                 HttpContext.Session.SetString("Current User", JsonSerializer.Serialize(currentUser));
 
+                ViewBag.Message = $"{currentUser.Email}";
+
                 return View("Chat");
             }
             else
             {
-                return View("Unauthorized");
+                return RedirectToAction("Unauthorized");
             }
 
         }
 
-        [Route("Account/Unauthorized")]
-        [HttpGet("Unauthorized")]
+        [HttpGet("Account/Unauthorized")]
         public IActionResult UnauthorizedRequest()
         {
             return View("Unauthorized");
@@ -67,13 +68,15 @@ namespace OleMissChatbox.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (_accountService.RegisterUser(model.FirstName, model.LastName, model.Email, model.Password))
+                if (_accountService.RegisterUser(model.FirstName, model.LastName, model.Email, model.Password, model.UserType))
                 {
-                    return View("Login");
+                    ViewBag.message = "Your sign up was successful!";
                 }
+                return View();
             }
 
-            return View("SignUp");
+            ViewBag.message = "Something went wrong trying to sign up.";
+            return View();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace OleMissChatbox.ViewModels
 {
-    public class ChatViewModel
+    public class UserViewModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

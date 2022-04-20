@@ -8,30 +8,7 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"></script>
 }
-@*<script>
-    $('#loginBtn').click(function() { login(); });
-    $('#password').keyup(function(event) {
-        if (event.keyCode === 13) {
-            login();
-        }
-    });
 
-    function login() {
-        var email = jQuery('#email').val();
-        var password = jQuery('#password').val();
-
-        $.ajax("@Url.Action("Login", "Account")",
-        {
-            method: "POST",
-            data: { email: email, password: password }
-        }).fail(function() {
-            jQuery('Unable to sign in').show();
-            $('#loginBtn').show();
-        });
-    };
-
-</script>
-}*@
 <!DOCTYPE html>
 <div class="col-md-6 offset-md-3">
     <div class="card card-body bg-light">
@@ -55,7 +32,7 @@
 
             <div>
                 <br />
-                <p>Sign up <a href="SignUp">here!</a></p>
+                <p>Sign up <a href="SignUp">here</a></p>
             </div>
         </form>
     </div>

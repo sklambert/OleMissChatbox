@@ -14,12 +14,19 @@ namespace OleMissChatbox.Data
 
         public User GetUserByEmail(string email)
         {
-            return _context.Users
-                .Where(u => u.Email == email)
-                .FirstOrDefault();
+            try
+            {
+                return _context.Users
+                 .Where(u => u.Email == email)
+                 .FirstOrDefault();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public bool AddUser(string firstname, string lastname, string email, string password)
+        public bool AddUser(string firstname, string lastname, string email, string password, int usertype)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
             if (user == null)
@@ -29,7 +36,8 @@ namespace OleMissChatbox.Data
                     FirstName = firstname,
                     LastName = lastname,
                     Email = email,
-                    Password = password
+                    Password = password,
+                    UserType = usertype
                 };
 
                 _context.Users.Add(user);

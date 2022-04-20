@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OleMissChatbox.Data;
+using OleMissChatbox.Hubs;
 using System;
 
 namespace OleMissChatbox
@@ -27,6 +28,8 @@ namespace OleMissChatbox
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
+
+            services.AddSignalR();
            
             services.AddMvc();
 
@@ -65,6 +68,7 @@ namespace OleMissChatbox
                     new { controller = "Account", action = "Login" });
 
                 cfg.MapRazorPages();
+                cfg.MapHub<ChatHub>("/chatHub");
             });
         }
     }

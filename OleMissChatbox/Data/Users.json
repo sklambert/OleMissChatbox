@@ -3,12 +3,14 @@
     "FirstName": "Seth",
     "LastName": "Lambert",
     "Email": "slamber1@go.olemiss.edu",
-    "Password": "5Ewke6HoPCkx4UnOEkA7OtMrKlodD1FcyjoggG2zMsI="
+    "Password": "5Ewke6HoPCkx4UnOEkA7OtMrKlodD1FcyjoggG2zMsI=",
+    "UserType": 2
   },
   {
     "FirstName": "Collin",
     "LastName": "Dill",
     "Email": "cwdill@gmail.com",
-    "Password": "5Ewke6HoPCkx4UnOEkA7OtMrKlodD1FcyjoggG2zMsI="
+    "Password": "5Ewke6HoPCkx4UnOEkA7OtMrKlodD1FcyjoggG2zMsI=",
+    "UserType": 0
   }
 ]

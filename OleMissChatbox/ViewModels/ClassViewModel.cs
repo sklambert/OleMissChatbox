@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace OleMissChatbox.Data.Entities
+namespace OleMissChatbox.ViewModels
 {
-    public class Class
+    public class ClassViewModel
     {
-        public int ClassId { get; set; }
         public string ClassName { get; set; }
         public DateTime CreatedDate { get; set; }
     }
