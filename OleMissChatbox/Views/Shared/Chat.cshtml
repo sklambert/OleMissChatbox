@@ -10,12 +10,9 @@
 <script src="~/js/chat.js"></script>
 }
 
-
-
-
 <body>
-    <div class="alert alert-warning alert-dismissible d-none" id="errorAlert" role="alert">
-        <span id="alert-message"></span>
+    <div class="alert alert-warning alert-dismissible d-none" id="error-message" role="alert">
+        <span id="error-message"></span>
         <button type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -25,11 +22,10 @@
         <div class="sidebar">
             <div class="header">
                 <h5>Chat Class</h5>
-                <button id="add-class" onclick="showCreateClassModal()">
+                <button id="add-class" hidden onclick="showCreateClassModal()">
                     Add Class
                     <i class="fas fa-plus"></i>
                 </button>
-                @*<button id="get-class" onclick="getClasses()">Test</button>*@
             </div>
         </div>
         <ul id="class-list"></ul>
@@ -65,6 +61,7 @@
     </div>
 </body>
 
+@*create class and error message modals below*@
 <div class="modal" id="create-class-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -81,6 +78,25 @@
             <div class="modal-footer">
                 <button type="button" id="close" onclick="hideCreateClassModal()" class="btn btn-secondary">Close</button>
                 <button type="button" id="create-class" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="error-message-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Notification</h5>
+                <button type="button" id="x-close" onclick="hideErrorMessageModal()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span id="user-error-message"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="close" onclick="hideErrorMessageModal()" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>

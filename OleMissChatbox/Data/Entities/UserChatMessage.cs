@@ -6,7 +6,7 @@ namespace OleMissChatbox.Data.Entities
     {
         public int UserChatMessageId { get; set; }
         public int UserId { get; set; }
-        public int MessageId { get; set; }
-        public int IsSender { get; set; }
+        public int ChatMessageId { get; set; }
+        // public int IsSender { get; set; }
     }
 }
