@@ -16,14 +16,14 @@ namespace OleMissChatbox.Controllers
             _accountService = new AccountService(repo);
         }
 
-        [Route("")]
+        [Route("Login")]
         [HttpGet("Login")]
         public IActionResult Login()
         {
             return View("Login");
         }
 
-        [HttpPost("")]
+        [HttpPost("Login")]
         public IActionResult Login(LoginViewModel model)
         {
             var currentUser = _accountService.GetAuthenticatedUser(model.Email, model.Password);
@@ -57,6 +57,7 @@ namespace OleMissChatbox.Controllers
             return RedirectToAction("Login");
         }
 
+        [Route("SignUp")]
         [HttpGet("SignUp")]
         public IActionResult SignUp()
         {

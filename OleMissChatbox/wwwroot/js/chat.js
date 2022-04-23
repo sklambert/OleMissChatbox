@@ -4,9 +4,14 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 let chatClasses = [];
 let chatUsers = [];
 let chatMessages = [];
+let joiningClass = "";
+let joinedClass = "";
 var userType;
 
 connection.start().then(function () {
+    connection.serverTimeoutInMilliseconds = 3600000;
+    var currentEmail = document.getElementById("email-header").textContent;
+    connection.invoke("SetConnection", currentEmail);
     document.getElementById("sendButton").disabled = false;
     getClasses();
     var currentEmail = document.getElementById("email-header").textContent;
@@ -17,7 +22,6 @@ connection.start().then(function () {
 
 connection.on("SetUserPermissionLevel", function (userType) {
     self.userType = userType;
-    console.log("connection.on, the usertype is " + self.userType);
     if (userType == 1 || userType == 2) {
         // make addClass button visible
         document.getElementById("add-class").hidden = false;
@@ -31,15 +35,6 @@ connection.on("SetUserPermissionLevel", function (userType) {
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
-
-connection.on("ReceiveMessage", function (user, message) {
-    var li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    // We can assign user-supplied strings to an element's textContent because it
-    // is not interpreted as markup. If you're assigning in any other way, you 
-    // should be aware of possible script injection concerns.
-    li.textContent = `${user} says ${message}`;
-});
 
 function showCreateClassModal() {
     $('#create-class-modal').modal('show');
@@ -63,14 +58,26 @@ function getClasses() {
     });
 }
 
+connection.on("ReceiveMessage", function (user, message) {
+    var li = document.createElement("li");
+    document.getElementById("messagesList").appendChild(li);
+    li.textContent = `${user}: ${message}`;
+});
+
 function joinClass(className) {
-    // Invokes the JoinClass method in ChatHub with the class name
+    joiningClass = className;
+    connection.invoke("JoinClass", className).then(function () {
+        joinedClass = joiningClass;
+        console.log("We're here in joinedClass " + joinedClass);
+        getUsers(className);
+        getMessages(className);
 
-    // Then track the name of the joined room (optionally call another JS function to handle this)
-    // Get the list of users (do this by calling getUsers() JS function)
-    // Get the sorted list of messages (do this by calling getMessages() JS function)
-
-
+        for (var i = 0; i < chatMessages.length; i++) {
+            var li = document.createElement("li");
+            document.getElementById("messagesList").appendChild(li);
+            li.textContent = `${chatMessages[i].messageSender}: ${chatMessages[i].messageString}`;
+        }
+    });
 }
 
 function getUsers(className) {
@@ -111,9 +118,9 @@ function hideErrorMessageModal() {
 };
 
 document.getElementById("sendButton").addEventListener("click", function (event) {
-    var user = document.getElementById("userInput").value;
+    var currentEmail = document.getElementById("email-header").textContent;
     var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", user, message).catch(function (err) {
+    connection.invoke("SendMessage", currentEmail, message, joinedClass).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();

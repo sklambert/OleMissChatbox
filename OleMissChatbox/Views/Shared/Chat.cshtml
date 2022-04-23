@@ -1,65 +1,56 @@
 ﻿@using OleMissChatbox.ViewModels
 
-<h4>Chat Page</h4>
-<h3 id="email-header">@ViewBag.Message</h3>
-<h3> is signed in</h3>
-
 @section Scripts {
 <script src="~/lib/knockout/build/output/knockout-latest.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
 }
+<link href="~/css/site.css" rel="stylesheet" />
 
-<body>
-    <div class="alert alert-warning alert-dismissible d-none" id="error-message" role="alert">
-        <span id="error-message"></span>
-        <button type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+<div class="alert alert-warning alert-dismissible d-none" id="error-message" role="alert">
+    <span id="error-message"></span>
+    <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="header">
-                <h5>Chat Class</h5>
-                <button id="add-class" hidden onclick="showCreateClassModal()">
-                    Add Class
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        <ul id="class-list"></ul>
+<div class="container">
 
-
-
-        <div class="row">&nbsp;</div>
-        <div class="row">
-            <div class="col-2">User</div>
-            <div class="col-4"><input type="text" id="userInput" /></div>
-        </div>
-        <div class="row">
-            <div class="col-2">Message</div>
-            <div class="col-4"><input type="text" id="messageInput" /></div>
-        </div>
-        <div class="row">&nbsp;</div>
-        <div class="row">
-            <div class="col-6">
-                <input type="button" id="sendButton" value="Send Message" />
-            </div>
-        </div>
+    <div class="row">
+        <h4>Chat Page</h4>
+        <h5 id="email-header">@ViewBag.Message</h5>
     </div>
 
     <div class="row">
-        <div class="col-12">
-            <hr />
+        <div class="col-sm-3">
+            <h5>Class list</h5>
+            <button id="add-class" hidden onclick="showCreateClassModal()">
+                Add Class
+                <i class="fas fa-plus"></i>
+            </button>
+            <ul class="classes list-unstyled" id="class-list"></ul>
+        </div>
+
+        <div class="col-sm-9">
+            <div class="chat-box">
+                <ul id="messagesList">
+                </ul>
+            </div>
         </div>
     </div>
+</div>
+
+
+
+<div class="chat-input">
     <div class="row">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
+        <div class="d-inline p-3">
+            <input class="col-9 offset-3" type="text" id="messageInput" />
         </div>
+        <div><input class="col-5 offset-7" type="button" id="sendButton" value="Send Message" /></div>
     </div>
-</body>
+</div>
+
 
 @*create class and error message modals below*@
 <div class="modal" id="create-class-modal" tabindex="-1" role="dialog">

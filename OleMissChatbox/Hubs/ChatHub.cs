@@ -11,14 +11,33 @@ namespace OleMissChatbox.Hubs
 {
     public class ChatHub : Hub
     {
-        public readonly static List<UserViewModel> _Connections = new List<UserViewModel>();
-        public readonly static List<ClassViewModel> _Classes = new List<ClassViewModel>();
+        public readonly static List<UserViewModel> _Connections = new();
+        public readonly static List<ClassViewModel> _Classes = new();
+        public readonly static Dictionary<string, UserViewModel> _Users = new();
 
         private readonly OleMissChatboxContext _context;
 
         public ChatHub(OleMissChatboxContext context)
         {
             _context = context;
+        }
+
+        public void SetConnection(string currentEmail)
+        {
+            var user = _context.Users.Where(u => u.Email == currentEmail).FirstOrDefault();
+            UserViewModel currentUser = new()
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                CurrentClass = ""
+            };
+            _Users.Add(Context.ConnectionId, currentUser);
+
+            if (!_Connections.Any(u => u.Email == user.Email))
+            {
+                _Connections.Add(currentUser);
+            }
         }
 
         public async Task SetUserPermissionLevel(string currentEmail)
@@ -30,9 +49,37 @@ namespace OleMissChatbox.Hubs
             await Clients.Caller.SendAsync("SetUserPermissionLevel", userType);
         }
 
-        public async Task SendMessage(string user, string message)
+        public async Task SendMessage(string email, string message, string className)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            try
+            {
+                var user = _context.Users.Where(u => u.Email == email).FirstOrDefault();
+                var currentClass = _context.Classes.Where(c => c.ClassName == className).FirstOrDefault();
+                if (!string.IsNullOrEmpty(message.Trim()))
+                {
+                    var msg = new ChatMessage()
+                    {
+                        MessageString = message,
+                        ClassId = currentClass.ClassId,
+                        MessageDate = DateTime.Now
+                    };
+                    _context.ChatMessages.Add(msg);
+                    _context.SaveChanges();
+                    var createdMessage = _context.ChatMessages.Where(cm => cm.MessageDate == msg.MessageDate).FirstOrDefault();
+
+                    var userChatMessage = new UserChatMessage()
+                    {
+                        UserId = user.UserId,
+                        ChatMessageId = createdMessage.ChatMessageId
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                await Clients.Caller.SendAsync("onError", "Message not sent!");
+            }
+
+            await Clients.Group(className).SendAsync("ReceiveMessage", email, message, className);
         }
 
         public async Task CreateClass(string currentEmail, string className)
@@ -57,17 +104,19 @@ namespace OleMissChatbox.Hubs
                         var newClass = new Class()
                         {
                             ClassName = className,
-                            CreatedDate = System.DateTime.Now,
+                            CreatedDate = DateTime.Now,
                         };
                         _context.Classes.Add(newClass);
                         _context.SaveChanges();
 
+                        var createdClass = _context.Classes.Where(cm => cm.CreatedDate == newClass.CreatedDate).FirstOrDefault();
+
                         var newUserClass = new UserClass()
                         {
-                            ClassId = newClass.ClassId,
+                            ClassId = createdClass.ClassId,
                             UserId = user.UserId,
                             IsOwner = true,
-                            RegistrationDate = System.DateTime.Now,
+                            RegistrationDate = DateTime.Now,
                         };
                         _context.UserClasses.Add(newUserClass);
                         _context.SaveChanges();
@@ -93,7 +142,8 @@ namespace OleMissChatbox.Hubs
         {
             try
             {
-                var user = _Connections.Where(u => u.Email == IdentityName).FirstOrDefault();
+                _Users.TryGetValue(Context.ConnectionId, out var userViewModel);
+                var user = _Connections.Where(u => u.Email == userViewModel.Email).FirstOrDefault();
                 if (user != null && user.CurrentClass != className)
                 {
                     if (!string.IsNullOrEmpty(user.CurrentClass))
@@ -138,27 +188,12 @@ namespace OleMissChatbox.Hubs
         public IEnumerable<ChatMessageViewModel> GetMessages(string className)
         {
             var currentClass = _context.Classes.Where(c => c.ClassName == className).FirstOrDefault();
-            List<UserClass> userClasses = _context.UserClasses.Where(uc => uc.ClassId == currentClass.ClassId).ToList();
-            List<UserChatMessage> userChatMessages = new();
 
-            foreach (UserClass userClass in userClasses)
-            {
-                var currentUserChatMessages = _context.UserChatMessages.Where(ucm => ucm.UserId == userClass.UserId).ToList();
-                userChatMessages.AddRange(currentUserChatMessages);
-            }
-
-            List<ChatMessage> chatMessages = new();
-
-            foreach (UserChatMessage userChatMessage in userChatMessages)
-            {
-                var currentChatMessages = _context.ChatMessages.Where(cm => cm.ChatMessageId == userChatMessage.ChatMessageId).ToList();
-                chatMessages.AddRange(currentChatMessages);
-            }
+            List<ChatMessage> chatMessages = _context.ChatMessages.Where(cm => cm.ClassId == currentClass.ClassId).ToList();
 
             chatMessages = chatMessages
                 .OrderByDescending(cm => cm.MessageDate)
-                .Take(20)
-                .AsEnumerable()
+                .Take(50)
                 .Reverse()
                 .ToList();
 
@@ -166,25 +201,35 @@ namespace OleMissChatbox.Hubs
 
             foreach (ChatMessage chatMessage in chatMessages)
             {
-                var currentUserChatMessage = _context.UserChatMessages.Where(ucm => ucm.ChatMessageId == chatMessage.ChatMessageId).FirstOrDefault();
-                var user = _context.Users.Where(u => u.UserId == currentUserChatMessage.UserId).FirstOrDefault();
+                var userChatMessage = _context.UserChatMessages.Where(ucm => ucm.ChatMessageId == chatMessage.ChatMessageId).FirstOrDefault();
+                var user = _context.Users.Where(u => u.UserId == userChatMessage.UserId).FirstOrDefault();
 
-                var chatMessageViewModel = new ChatMessageViewModel
+                chatMessageViewModels.Add(new ChatMessageViewModel
                 {
                     MessageString = chatMessage.MessageString,
                     MessageSender = user.FirstName + " " + user.LastName,
                     MessageDate = chatMessage.MessageDate
-                };
-
-                chatMessageViewModels.Add(chatMessageViewModel);
+                });
             }
 
             return chatMessageViewModels;
         }
 
-        private string IdentityName
+        public override Task OnDisconnectedAsync(Exception exception)
         {
-            get { return Context.User.Identity.Name; }
+            try
+            {
+                _Users.TryGetValue(Context.ConnectionId, out var user);
+                var connectedUser = _Connections.Where(u => u.Email == user.Email).First();
+                _Connections.Remove(connectedUser);
+
+                Clients.OthersInGroup(connectedUser.CurrentClass).SendAsync("removeUser", connectedUser);
+            }
+            catch (Exception ex)
+            {
+                Clients.Caller.SendAsync("onError", "OnDisconnected: " + ex.Message);
+            }
+            return base.OnDisconnectedAsync(exception);
         }
 
         private User GetCurrentUser(string email)
