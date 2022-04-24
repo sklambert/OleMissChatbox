@@ -2,8 +2,8 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 let chatClasses = [];
-let chatUsers = [];
-let chatMessages = [];
+//let chatUsers = [];
+//let chatMessages = [];
 let joiningClass = "";
 let joinedClass = "";
 var userType;
@@ -68,41 +68,47 @@ function joinClass(className) {
     joiningClass = className;
     connection.invoke("JoinClass", className).then(function () {
         joinedClass = joiningClass;
-        console.log("We're here in joinedClass " + joinedClass);
-        getUsers(className);
-        getMessages(className);
 
-        for (var i = 0; i < chatMessages.length; i++) {
-            var li = document.createElement("li");
-            document.getElementById("messagesList").appendChild(li);
-            li.textContent = `${chatMessages[i].messageSender}: ${chatMessages[i].messageString}`;
-        }
+        document.getElementById("messagesList").innerHTML = "";
+        connection.invoke("GetMessages", className).then(function (result) {
+            let chatMessages = [];
+            for (var i = 0; i < result.length; i++) {
+                chatMessages.push(new ChatMessage(result[i].messageString, result[i].messageSender, result[i].messageDate));
+            }
+            document.getElementById("messagesList").innerHTML = "";
+            for (var i = 0; i < chatMessages.length; i++) {
+                var li = document.createElement("li");
+                document.getElementById("messagesList").appendChild(li);
+                li.textContent = `${chatMessages[i].messageSender}: ${chatMessages[i].messageString}`;
+            }
+        });
     });
 }
 
-function getUsers(className) {
-    connection.invoke("GetUsers", className).then(function (result) {
-        for (var i = 0; i < result.length; i++) {
-            chatUsers.push(new ChatUser(result[i].email, result[i].firstName, result[i].lastName, result[i].currentClass));
-        }
-    });
-}
+
+//function getUsers(className) {
+//    connection.invoke("GetUsers", className).then(function (result) {
+//        for (var i = 0; i < result.length; i++) {
+//            chatUsers.push(new ChatUser(result[i].email, result[i].firstName, result[i].lastName, result[i].currentClass));
+//        }
+//    });
+//}
 
 function getMessages(className) {
     connection.invoke("GetMessages", className).then(function (result) {
         for (var i = 0; i < result.length; i++) {
-            chatUsers.push(new ChatMessage(result[i].messageString, result[i].messageSender, result[i].messageDate));
+            chatMessages.push(new ChatMessage(result[i].messageString, result[i].messageSender, result[i].messageDate));
         }
     });
 }
 
-connection.on("addUser", function (user) {
-    chatUsers.push(user);
-});
+//connection.on("addUser", function (user) {
+//    chatUsers.push(user);
+//});
 
-connection.on("removeUser", function (user) {
-    chatUsers.splice(chatUsers.indexOf(user));
-});
+//connection.on("removeUser", function (user) {
+//    chatUsers.splice(chatUsers.indexOf(user));
+//});
 
 connection.on("addClass", function () {
     getClasses();

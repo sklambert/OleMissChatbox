@@ -1,39 +1,51 @@
 ﻿@using OleMissChatbox.ViewModels
 
+
 @section Scripts {
 <script src="~/lib/knockout/build/output/knockout-latest.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"></script>
 }
+
 <link href="~/css/site.css" rel="stylesheet" />
+
+@*<style type="text/css">
+    .active, li:hover {
+        color: blue;
+    }
+</style>*@
 
 <div class="alert alert-warning alert-dismissible d-none" id="error-message" role="alert">
     <span id="error-message"></span>
-    <button type="button" class="close" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+    <button type="button" class="btn-close" aria-label="Close">
+        @*<span aria-hidden="true">&times;</span>*@
     </button>
 </div>
 
 <div class="container">
 
     <div class="row">
-        <h4>Chat Page</h4>
-        <h5 id="email-header">@ViewBag.Message</h5>
+        <h1 class="text-center">Chat</h1>
+        <div><h6 id="email-header">@ViewBag.Message</h6></div>
     </div>
 
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-3 card card-body bg-light text-center">
             <h5>Class list</h5>
-            <button id="add-class" hidden onclick="showCreateClassModal()">
+            <button class="btn btn-success" id="add-class" hidden onclick="showCreateClassModal()">
                 Add Class
                 <i class="fas fa-plus"></i>
             </button>
-            <ul class="classes list-unstyled" id="class-list"></ul>
+            <section>
+                <ul class="classes list-unstyled card" style="cursor:pointer" id="class-list"></ul>
+            </section>
         </div>
 
-        <div class="col-sm-9">
+        <div class="col-sm-9 card card-body bg-light">
             <div class="chat-box">
-                <ul id="messagesList">
+                <ul class="classes list-unstyled" id="messagesList">
                 </ul>
             </div>
         </div>
@@ -44,10 +56,10 @@
 
 <div class="chat-input">
     <div class="row">
-        <div class="d-inline p-3">
-            <input class="col-9 offset-3" type="text" id="messageInput" />
+        <div class="d-inline p-3 card card-body bg-light">
+            <input class="col-9 offset-3" type="text" id="messageInput" placeholder="Type your message here..." />
         </div>
-        <div><input class="col-5 offset-7" type="button" id="sendButton" value="Send Message" /></div>
+        <div class="d-inline p-3"><input class="col-5 offset-7 btn btn-primary" type="button" id="sendButton" value="Send Message" /></div>
     </div>
 </div>
 
@@ -58,8 +70,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Create Class</h5>
-                <button type="button" id="x-close" onclick="hideCreateClassModal()" class="close" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" id="x-close" onclick="hideCreateClassModal()" class="btn-close" aria-label="Close">
+                    @*                    <span aria-hidden="true">&times;</span>*@
                 </button>
             </div>
             <div class="modal-body">
@@ -79,8 +91,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">User Notification</h5>
-                <button type="button" id="x-close" onclick="hideErrorMessageModal()" class="close" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" id="x-close" onclick="hideErrorMessageModal()" class="btn-close" aria-label="Close">
+                    @*<span aria-hidden="true">&times;</span>*@
                 </button>
             </div>
             <div class="modal-body">

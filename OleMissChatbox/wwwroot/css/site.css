@@ -82,6 +82,7 @@ body {
 .chat-box {
     height: 510px;
     overflow-y: scroll;
+    background-color: white;
 }
 
 .rounded-lg {

@@ -72,6 +72,8 @@ namespace OleMissChatbox.Hubs
                         UserId = user.UserId,
                         ChatMessageId = createdMessage.ChatMessageId
                     };
+                    _context.UserChatMessages.Add(userChatMessage);
+                    _context.SaveChanges();
                 }
             }
             catch (Exception)
